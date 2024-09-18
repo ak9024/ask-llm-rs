@@ -11,7 +11,7 @@ use std::{
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     loop {
-        print!(">> You? ");
+        print!(">> You: ");
         io::stdout().flush().unwrap();
 
         let mut message = String::new();
