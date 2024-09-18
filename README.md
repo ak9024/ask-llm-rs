@@ -1,8 +1,12 @@
 # ask-llm-rs
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/ak9024/ask-llm-rs/rust.yml) 
+![GitHub License](https://img.shields.io/github/license/ak9024/ask-llm-rs)
 
 ![demo](./demo.png)
 
 CLI build with Rust to interact with any LLM services.
+
+## Usage
 
 ```bash
 # create .env
@@ -37,3 +41,6 @@ LLM_API_KEY=
 LLM_MODEL=claude-3-5-sonnet-20240620
 ```
 
+## License
+
+MIT
