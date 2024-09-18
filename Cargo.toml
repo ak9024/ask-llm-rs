@@ -1,0 +1,24 @@
+[package]
+name = "ask-llm-rs"
+description = "Interact with an LLM service"
+authors = ["Adiatma Kamarudin <contact@adiatma.tech>"]
+readme = "README.md"
+repository = "https://github.com/ak9024/ask-llm-rs"
+keywords = ["rust", "llm"]
+version = "0.1.0"
+rust-version = "1.81.0"
+categories = ["command-line-utilities"]
+edition = "2021"
+license = "MIT"
+
+[dependencies]
+async-trait = "0.1.82"
+dotenvy = { git = "https://github.com/allan2/dotenvy", version = "0.15.7", features = ["macros"] }
+mockito = "1.5.0"
+reqwest = { version = "0.12.7", features = ["json"] }
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = "1.0.128"
+tokio = { version = "1.40.0", features = ["full"] }
+
+[profile.release]
+strip = true
