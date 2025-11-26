@@ -7,22 +7,50 @@ use std::error::Error;
 
 pub mod entity;
 
+/// The main LLM client that handles communication with LLM APIs.
+///
+/// This struct manages the HTTP client and configuration for making
+/// requests to various LLM services (OpenAI, Anthropic, LocalAI, etc.).
 pub struct LLM {
-    pub config: Config,
-    pub client: Client,
+    config: Config,
+    client: Client,
 }
 
+/// Configuration for the LLM client.
+///
+/// Contains the necessary information to connect to an LLM service,
+/// including the API endpoint, authentication key, and request parameters.
 pub struct Config {
     pub base_url: String,
     pub req: entity::Request,
     pub api_key: String,
 }
 
+/// Trait defining the interface for LLM interactions.
+///
+/// This trait provides a standardized way to interact with different
+/// LLM providers through a common API.
 #[async_trait]
 pub trait LLMInterface {
+    /// Creates a new LLM client instance with the given configuration.
     fn new(config: Config) -> Self;
+
+    /// Sends a chat request to the LLM service and returns the response.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - The HTTP request fails
+    /// - The response cannot be parsed
+    /// - The API returns an error status code
     async fn chat(&self) -> Result<entity::Response, Box<dyn Error>>;
-    fn headers(&self) -> HeaderMap;
+
+    /// Builds the HTTP headers required for API requests.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the API key contains invalid characters.
+    fn headers(&self) -> Result<HeaderMap, Box<dyn Error>>;
 }
 
 #[async_trait]
@@ -38,7 +66,7 @@ impl LLMInterface for LLM {
         let response = self
             .client
             .post(&self.config.base_url)
-            .headers(self.headers())
+            .headers(self.headers()?)
             .json(&self.config.req)
             .send()
             .await?
@@ -48,15 +76,15 @@ impl LLMInterface for LLM {
         Ok(response)
     }
 
-    fn headers(&self) -> HeaderMap {
+    fn headers(&self) -> Result<HeaderMap, Box<dyn Error>> {
         let mut headers: HeaderMap = HeaderMap::new();
         headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
-        headers.insert(
-            AUTHORIZATION,
-            HeaderValue::from_str(&format!("Bearer {}", self.config.api_key)).unwrap(),
-        );
 
-        headers
+        let auth_value = HeaderValue::from_str(&format!("Bearer {}", self.config.api_key))
+            .map_err(|e| format!("Invalid API key: {}", e))?;
+        headers.insert(AUTHORIZATION, auth_value);
+
+        Ok(headers)
     }
 }
 
